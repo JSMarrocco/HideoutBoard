@@ -132,6 +132,7 @@ android {
         applicationId "com.hideoutboard"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
         missingDimensionStrategy 'react-native-camera', 'general' 
@@ -192,6 +193,8 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
     implementation project(path: ':openCVLibrary451')
+    implementation "androidx.multidex:multidex:2.0.1"
+    implementation project(':react-native-camera')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
