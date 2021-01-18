@@ -24,7 +24,6 @@ import org.opencv.android.OpenCVLoader;
 
 import android.util.Log;
 
-
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =

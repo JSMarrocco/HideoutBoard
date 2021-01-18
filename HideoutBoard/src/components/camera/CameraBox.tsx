@@ -3,38 +3,67 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import {  View } from "../Themed";
 import { RNCamera as Camera, TakePictureResponse } from "react-native-camera";
 import CameraPreview from "./CameraPreview";
+import OpenCV from "../../NativeModules/OpenCV";
+import { Hold } from "../walls/wall";
 
 const CameraBox = (): JSX.Element => {
     const camera = useRef<Camera | null>();
     const [isPreview, setIsPreview] = useState(false);
-    const [capturedImage, setCapturedImage] = useState<any>(null);
+    const [capturedImage, setCapturedImage] = useState<TakePictureResponse | null>(null);
+    const [capturedHolds, setCapturedHolds] = useState<Hold[] | null>(null);
 
+    const processWall = (imgBase64: string, imgUri: string) => {
+
+        imgUri = imgUri.replace("file://", "");
+
+        return OpenCV.processWall(imgBase64, imgUri, (err: string)=> {
+            console.log(`[DEBUG - ERROR]: ${err}`);
+        }, (res: string)=> {
+            const holds: Hold[] = [];
+            JSON.parse(res).forEach( (HoldPosition: number[]) => {
+                holds.push({position : {x:HoldPosition[0], y:HoldPosition[1], w:HoldPosition[2], h:HoldPosition[3]}});
+            });
+            console.log(holds.length);
+            console.log(holds[0]);
+
+            setCapturedHolds(holds);
+
+        } );
+    };
 
     const takePicture = async () => {
         if (!camera.current) return;
-        const options = { quality: 0.5, base64: true };
+        const options = { quality: 1., base64: true };
         const data = await camera.current.takePictureAsync(options);
 
         if (!data) return;
 
+        camera.current.resumePreview();
         setIsPreview(true);
         setCapturedImage(data);
-        camera.current.resumePreview();
+
+        if (!data.base64) return;
+        // console.log(data.base64);
+
+        processWall(data.base64, data.uri);
+
     };
 
     const retakePicture = () => {
         setCapturedImage(null);
+        setCapturedHolds(null);
         setIsPreview(false);
     };
 
 
-    return (isPreview) ?
-        (<CameraPreview photo={capturedImage} retakePictureAction={retakePicture}/>) :
+    return (isPreview && capturedImage && capturedHolds) ?
+        (<CameraPreview photo={capturedImage} retakePictureAction={retakePicture} holds={capturedHolds} />) :
         (
             <View style={styles.container}>
                 <Camera
                     ref={ref => { camera.current = ref;}}
                     style={styles.preview}
+                    captureAudio={false}
                     androidCameraPermissionOptions={{
                         title: "Permission to use camera",
                         message: "We need your permission to use your camera",
