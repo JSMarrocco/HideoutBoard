@@ -31,7 +31,7 @@ export default function BottomTabNavigator(): JSX.Element {
                 name="ScanWall"
                 component={ScanWallNavigator}
                 options={{
-                    tabBarIcon: ({ color }) => <TabBarIcon name="camera" color={color} />,
+                    tabBarIcon: ({ color }) => <TabBarIcon name="plus" color={color} />,
                 }}
             />
         </BottomTab.Navigator>
@@ -68,7 +68,7 @@ function ScanWallNavigator() {
             <ScanWallStack.Screen
                 name="ScanWallScreen"
                 component={ScanWallScreen}
-                options={{ headerTitle: "Scan new wall" }}
+                options={{ headerTitle: "Create new Hideout Board" }}
             />
         </ScanWallStack.Navigator>
     );

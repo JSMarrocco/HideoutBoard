@@ -29,8 +29,11 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.dnn.Dnn;
 
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -108,12 +111,13 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactMethod
     public void processWall(String imageBase64, String imageUri, Callback errorCallback, Callback successCallback) {
         try {
 
-            String cfgFile = this.reactContext.getCacheDir() + "/yolov3_testing.cfg";
-            String weightsFile = this.reactContext.getCacheDir() + "/yolov3_training_last_2.weights";
+            String cfgFile = this.reactContext.getDataDir()+ "/yolov3_testing.cfg";
+            String weightsFile =this.reactContext.getDataDir() + "/yolov3_training_last_2.weights";
 
             // Load Yolo Model
             Net net = Dnn.readNetFromDarknet(cfgFile, weightsFile);
@@ -188,11 +192,6 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
             List<Double[]> holds= new ArrayList<Double[]>();
             for(int i: mnsIndexes.toList()) {
                 holds.add(new Double[] {boxes.get(i).x, boxes.get(i).y, boxes.get(i).width, boxes.get(i).height});
-
-                Rect box = new Rect((int) boxes.get(i).x, (int)  boxes.get(i).y,  (int) boxes.get(i).width, (int) boxes.get(i).height);
-                Scalar color = new Scalar(255, 0,0);
-
-                Imgproc.rectangle(imgMat, box, color);
             }
 
 
@@ -205,6 +204,7 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void copyAssets() {
         AssetManager assetManager = this.reactContext.getAssets();
         String[] files = null;
@@ -219,7 +219,7 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
             OutputStream out = null;
             try {
                 in = assetManager.open("yolo/" + filename);
-                File outFile = new File(this.reactContext.getCacheDir() +"/", filename);
+                File outFile = new File(this.reactContext.getDataDir() +"/", filename);
                 out = new FileOutputStream(outFile);
                 copyFile(in, out);
                 in.close();

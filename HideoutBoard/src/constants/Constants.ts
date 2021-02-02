@@ -1,0 +1,1 @@
+export const WALLS_DATA_FILE_NAME = "WallsDataFileName.json";
