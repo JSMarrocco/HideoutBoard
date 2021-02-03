@@ -17,6 +17,7 @@ const ClimbingIconXML = `
 
 `;
 
-const ClimbingIcon =  (props: {color: string}): JSX.Element => <SvgXml xml={ClimbingIconXML} width="100%" height="100%" {...props} />;
+const ClimbingIcon =  (props: {color: string, size:number}): JSX.Element =>
+    <SvgXml xml={ClimbingIconXML} width={props.size} height={props.size} {...props} />;
 
 export default ClimbingIcon;

@@ -8,8 +8,10 @@ import { StyleSheet } from "react-native";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import TabOneScreen from "../screens/TabOneScreen";
-import { ScanWallParamList, BottomTabParamList, TabOneParamList, } from "./types";
+import { ScanWallParamList, BottomTabParamList, TabOneParamList, MyWallsParamList, } from "./types";
 import ScanWallScreen from "../screens/ScanWallScreen";
+import MyWallsScreen from "../screens/MyWallsScreen";
+import ClimbingIcon from "../../assets/svg/climbingIcon";
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -20,11 +22,18 @@ export default function BottomTabNavigator(): JSX.Element {
         <BottomTab.Navigator
             initialRouteName="TabOne"
             tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
-            <BottomTab.Screen
+            {/* <BottomTab.Screen
                 name="TabOne"
                 component={TabOneNavigator}
                 options={{
                     tabBarIcon: ({ color }) => <TabBarIcon name="help-circle" color={color} />,
+                }}
+            /> */}
+            <BottomTab.Screen
+                name="MyWalls"
+                component={MyWallsNavigator}
+                options={{
+                    tabBarIcon: ({ color }) => <ClimbingIcon color={color}  size={30} />,
                 }}
             />
             <BottomTab.Screen
@@ -71,6 +80,20 @@ function ScanWallNavigator() {
                 options={{ headerTitle: "Create new Hideout Board" }}
             />
         </ScanWallStack.Navigator>
+    );
+}
+
+const MyWallsStack = createStackNavigator<MyWallsParamList>();
+
+function MyWallsNavigator() {
+    return (
+        <MyWallsStack.Navigator>
+            <MyWallsStack.Screen
+                name="MyWallsScreen"
+                component={MyWallsScreen}
+                options={{ headerTitle: "Walls" }}
+            />
+        </MyWallsStack.Navigator>
     );
 }
 

@@ -27,13 +27,12 @@ export function deleteFile(filepath: string): Promise<void> {
 
 export function readFile(fileName: string): Promise<undefined | string> {
 
-    const filepath = `file://${RNFS.DocumentDirectoryPath}/${fileName}`;
+    const filepath = `file://${RNFS.CachesDirectoryPath}/${fileName}`;
 
     return new Promise((resolve, reject) =>
     {
         RNFS.exists(filepath)
             .then( (result): void  => {
-
                 if (!result) resolve(undefined);
 
                 RNFS.readFile(filepath, "ascii")
@@ -49,7 +48,7 @@ export function readFile(fileName: string): Promise<undefined | string> {
 
 export function writeFile(fileName: string, json: string): Promise<void> {
 
-    const filepath = `file://${RNFS.DocumentDirectoryPath}/${fileName}`;
+    const filepath = `file://${RNFS.CachesDirectoryPath}/${fileName}`;
 
     return new Promise((resolve, reject) =>
     {

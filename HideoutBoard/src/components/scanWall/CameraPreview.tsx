@@ -5,7 +5,7 @@ import {ImageBackground, StyleSheet, TouchableOpacity, View } from "react-native
 import { TakePictureResponse } from "react-native-camera";
 import { Appbar } from "react-native-paper";
 import { AppbarHeader } from "../Themed";
-import { Hold } from "../walls/wall";
+import { Hold } from "../walls/WallComponents";
 
 type CameraPreviewProps = {
     photo: TakePictureResponse;

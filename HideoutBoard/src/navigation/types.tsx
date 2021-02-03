@@ -6,6 +6,7 @@ export type RootStackParamList = {
 export type BottomTabParamList = {
     TabOne: undefined;
     ScanWall: undefined;
+    MyWalls: undefined;
   };
 
 export type TabOneParamList = {
@@ -14,4 +15,8 @@ export type TabOneParamList = {
 
 export type ScanWallParamList = {
     ScanWallScreen: undefined;
+  };
+
+export type MyWallsParamList = {
+    MyWallsScreen: undefined;
   };
