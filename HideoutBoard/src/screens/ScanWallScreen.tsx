@@ -44,9 +44,13 @@ const ScanWallScreen = (): JSX.Element => {
 
             setIsScaning(false);
 
-        }, (res: string)=> {
+        }, (HoldsBoxes: string, HoldsContours:string ) => {
             const holds: Hold[] = [];
-            JSON.parse(res).forEach( (HoldPosition: number[]) => {
+
+            console.log(HoldsContours);
+            
+
+            JSON.parse(HoldsBoxes).forEach( (HoldPosition: number[]) => {
                 holds.push({position : {x:HoldPosition[0], y:HoldPosition[1], w:HoldPosition[2], h:HoldPosition[3]}});
             });
 
@@ -59,10 +63,6 @@ const ScanWallScreen = (): JSX.Element => {
         readFile("TestFile");
 
         setIsScaning(true);
-
-        if (goodToast.current) {
-            goodToast.current.show("Processing");
-        }
 
         if (!camera.current) return;
         const options = { quality: 1., base64: true, pauseAfterCapture: true};

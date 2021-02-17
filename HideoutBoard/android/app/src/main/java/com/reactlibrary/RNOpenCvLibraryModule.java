@@ -12,6 +12,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
@@ -19,7 +20,9 @@ import org.opencv.android.Utils;
 import org.opencv.core.MatOfByte;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfInt;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.MatOfRect2d;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Rect2d;
 import org.opencv.core.Scalar;
@@ -60,57 +63,6 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
         return "RNOpenCvLibrary";
     }
 
-    @ReactMethod
-    public void checkForBlurryImage(String imageAsBase64, Callback errorCallback, Callback successCallback) {
-        try {
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inDither = true;
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-
-            byte[] decodedString = Base64.decode(imageAsBase64, Base64.DEFAULT);
-            Bitmap image = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-
-//      Bitmap image = decodeSampledBitmapFromFile(imageurl, 2000, 2000);
-            int l = CvType.CV_8UC1; //8-bit grey scale image
-            Mat matImage = new Mat();
-            Utils.bitmapToMat(image, matImage);
-            Mat matImageGrey = new Mat();
-            Imgproc.cvtColor(matImage, matImageGrey, Imgproc.COLOR_BGR2GRAY);
-
-            Bitmap destImage;
-            destImage = Bitmap.createBitmap(image);
-            Mat dst2 = new Mat();
-            Utils.bitmapToMat(destImage, dst2);
-            Mat laplacianImage = new Mat();
-            dst2.convertTo(laplacianImage, l);
-            Imgproc.Laplacian(matImageGrey, laplacianImage, CvType.CV_8U);
-            Mat laplacianImage8bit = new Mat();
-            laplacianImage.convertTo(laplacianImage8bit, l);
-
-            Bitmap bmp = Bitmap.createBitmap(laplacianImage8bit.cols(), laplacianImage8bit.rows(), Bitmap.Config.ARGB_8888);
-            Utils.matToBitmap(laplacianImage8bit, bmp);
-            int[] pixels = new int[bmp.getHeight() * bmp.getWidth()];
-            bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-            int maxLap = -16777216; // 16m
-            for (int pixel : pixels) {
-                if (pixel > maxLap)
-                    maxLap = pixel;
-            }
-
-//            int soglia = -6118750;
-            int soglia = -8118750;
-            if (maxLap <= soglia) {
-                System.out.println("is blur image");
-            }
-
-            successCallback.invoke(maxLap <= soglia);
-        } catch (Exception e) {
-            errorCallback.invoke(e.getMessage());
-        }
-    }
-
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     @ReactMethod
     public void processWall(String imageBase64, String imageUri, Callback errorCallback, Callback successCallback) {
@@ -130,8 +82,6 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
             }
 
             Mat imgMat =  Imgcodecs.imread(imageUri);
-
-
 
             Mat resizedImgMat = new Mat();
             Imgproc.resize(imgMat, resizedImgMat,  new Size(imgMat.size().width, imgMat.size().width * 4/3) , 1, 1);
@@ -163,7 +113,7 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
                     double confidence = out.get(i,5)[0];
 
 
-                    if (confidence > 0.1) {
+                    if (confidence > 0.2) {
 
                         double centerX = (double) (out.get(i,0)[0] * width);
                         double centerY = (double) (out.get(i,1)[0] * height);
@@ -190,12 +140,63 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
             Dnn.NMSBoxes(matBoxes, matConfidences, (float)0.5, (float)0.4, mnsIndexes);
 
             List<Double[]> holds= new ArrayList<Double[]>();
-            for(int i: mnsIndexes.toList()) {
+            List<List<Point>> holdsContours = new ArrayList<List<Point>>();
+//            for(int i: mnsIndexes.toList()) {
+                int i =  mnsIndexes.toList().get(3);
+                // Contours detection
+                int x = (int)boxes.get(i).x;
+                int y = (int)boxes.get(i).y;
+                int w = (int)boxes.get(i).width;
+                int h = (int)boxes.get(i).height;
+                Mat frame = resizedImgMat.submat(y, y+h, x, x+w);
+
+                // TODO: Add brightness contrast
+
+                Imgproc.GaussianBlur(frame, frame, new Size(5,5), 0);
+                Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2HSV);
+
+                Mat color_frame = frame.submat(h/4, h - (h/4), w/4, w - (w/4));
+                Scalar avgColor = Core.mean(color_frame);
+
+                Mat mask = frame;
+                int step = 100;
+                Scalar lower = new Scalar(avgColor.val[0] - step, avgColor.val[1] - step, avgColor.val[2] - step, avgColor.val[3]);
+                Scalar upper = new Scalar(avgColor.val[0] + step, avgColor.val[1] + step, avgColor.val[2] + step, avgColor.val[3]);
+                Core.inRange(frame, lower, upper, mask);
+
+                List<MatOfPoint> contours = new ArrayList<>();
+                Mat hierarchy = new Mat();
+                Imgproc.findContours(mask, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
+
+                double maxArea = 0.0;
+                MatOfPoint maxContour = new MatOfPoint();
+                maxContour.fromArray(new Point(x,y), new Point(x+w,y), new Point(x,y+h), new Point(x+w,y+h));
+
+                for (MatOfPoint contour: contours) {
+                    double area = Imgproc.contourArea(contour);
+                    if  (area > maxArea && area <= ( w*h*0.98 ) && area >= (w*h*0.1)) {
+                        maxArea = area;
+                        maxContour = contour;
+                    }
+                }
+
+                List<Point> maxContourToList = maxContour.toList();
+                int smooth_step = maxContourToList.size() / 10;
+                List<Point> smooth_contour = new ArrayList<Point>();
+                for (int batch = 0; batch < maxContourToList.size(); batch+=smooth_step ) {
+                    Point point = maxContourToList.get(batch);
+                    point.x += x;
+                    point.y += y;
+                    smooth_contour.add(point);
+                }
+
+                holdsContours.add(smooth_contour);
                 holds.add(new Double[] {boxes.get(i).x, boxes.get(i).y, boxes.get(i).width, boxes.get(i).height});
-            }
+
+//            }
 
 
-            successCallback.invoke(new Gson().toJson(holds));
+            successCallback.invoke(new Gson().toJson(holds), new Gson().toJson(holdsContours));
 
         }
         catch (Exception e) {
