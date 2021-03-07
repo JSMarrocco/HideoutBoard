@@ -84,9 +84,9 @@ module.exports = {
             "WithStatement", //with
             "ForOfStatement", //remove for loop.
             "ForInStatement", //remove for in, for of -> use Array.forEach
-            "ForStatement",
-            "SwitchStatement", //remove switch -> use object/Map instead.
-            "SwitchCase",
+            // "ForStatement",
+            // "SwitchStatement", //remove switch -> use object/Map instead.
+            // "SwitchCase",
         ],
         "no-trailing-spaces" : "error",
         "no-unneeded-ternary" : ["error", {"defaultAssignment" : false}],

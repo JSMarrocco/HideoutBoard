@@ -26,6 +26,7 @@ const MyWallsScreen = (): JSX.Element => {
         return (
             <TouchableOpacity onPress={() => {
                 deleteFile(`file://${RNFS.DocumentDirectoryPath}/${WALLS_DATA_FILE_NAME}`);
+                deleteFile(wall.imageUri);
                 setWalls([]);
             }}>
                 <ListTile>

@@ -47,12 +47,19 @@ const ScanWallScreen = (): JSX.Element => {
         }, (HoldsBoxes: string, HoldsContours:string ) => {
             const holds: Hold[] = [];
 
-            console.log(HoldsContours);
-            
+            const contours: [[{x: number; y:number}]]  = JSON.parse(HoldsContours);
+            const box: [[number]] = JSON.parse(HoldsBoxes);
 
-            JSON.parse(HoldsBoxes).forEach( (HoldPosition: number[]) => {
-                holds.push({position : {x:HoldPosition[0], y:HoldPosition[1], w:HoldPosition[2], h:HoldPosition[3]}});
-            });
+            console.log(`${contours.length} contours / ${box.length} holds`);
+
+
+            for (let i = 0; i < box.length; i++) {
+                holds.push({
+                    contour: contours[i],
+                    box: {x: box[i][0], y: box[i][1], w: box[i][2], h: box[i][3]}
+                });
+            }
+
 
             setIsScaning(false);
             setCapturedHolds(holds);
