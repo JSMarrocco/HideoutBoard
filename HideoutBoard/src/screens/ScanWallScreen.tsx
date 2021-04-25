@@ -3,7 +3,7 @@ import { ActivityIndicator, StyleSheet, TouchableOpacity} from "react-native";
 import Toast from "react-native-easy-toast";
 import { Text, View } from "../components/Themed";
 import { RNCamera as Camera, TakePictureResponse } from "react-native-camera";
-import { Hold, Wall } from "../components/walls/WallComponents";
+import { Hold, HoldType, Wall } from "../components/walls/WallComponents";
 import OpenCV from "../NativeModules/OpenCV";
 import { deleteFile, readFile, writeFile } from "../helpers/FileManaging";
 import { Guid } from "guid-typescript";
@@ -50,13 +50,12 @@ const ScanWallScreen = (): JSX.Element => {
             const contours: [[{x: number; y:number}]]  = JSON.parse(HoldsContours);
             const box: [[number]] = JSON.parse(HoldsBoxes);
 
-            console.log(`${contours.length} contours / ${box.length} holds`);
-
-
             for (let i = 0; i < box.length; i++) {
                 holds.push({
+                    id: i,
                     contour: contours[i],
-                    box: {x: box[i][0], y: box[i][1], w: box[i][2], h: box[i][3]}
+                    box: {x: box[i][0], y: box[i][1], w: box[i][2], h: box[i][3]},
+                    type: HoldType.neutral
                 });
             }
 
@@ -100,11 +99,16 @@ const ScanWallScreen = (): JSX.Element => {
         if(!capturedHolds || !capturedImage) return;
 
         const newWall: Wall = {
-            id: Guid.create().toString(),
+            key: Guid.create().toString(),
             name: name,
             description: description,
             holds: capturedHolds,
-            imageUri: capturedImage.uri
+            routes: [],
+            picture: {
+                width: capturedImage.width,
+                height: capturedImage.height,
+                uri: capturedImage.uri
+            }
         };
 
         setWalls(walls.concat(newWall));
@@ -122,7 +126,11 @@ const ScanWallScreen = (): JSX.Element => {
 
     if (boxState==BoxState.preview && capturedImage && capturedHolds) {
         return (<CameraPreview
-            photo={capturedImage}
+            photo={{
+                width: capturedImage.width,
+                height: capturedImage.height,
+                uri: capturedImage.uri
+            }}
             holds={capturedHolds}
             retakePictureAction={retakePicture}
             confirmPictureAction = {() => { setBoxState(BoxState.register);}} />);

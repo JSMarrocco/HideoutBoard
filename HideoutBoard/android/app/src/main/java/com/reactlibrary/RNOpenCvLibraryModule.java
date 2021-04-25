@@ -85,6 +85,8 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
             // Detecting objects
             System.out.println("[DEBUG] : Detecting objects Started");
 
+            resizedImgMat = applyBrightnessContrast(resizedImgMat, 64, 64);
+
             Mat blob = Dnn.blobFromImage(resizedImgMat,0.00392, new Size(416, 416), new Scalar(0,0,0), true, false);
 
             List<Mat> outs = new ArrayList<Mat>();
@@ -164,7 +166,7 @@ public class RNOpenCvLibraryModule extends ReactContextBaseJavaModule {
                 }
 
                 // TODO: Add brightness contrast
-                frame = applyBrightnessContrast(frame, 64, 64);
+//                frame = applyBrightnessContrast(frame, 64, 64);
                 System.gc();
                 System.runFinalization();
 

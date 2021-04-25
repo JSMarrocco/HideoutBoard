@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Text as DefaultText, View as DefaultView } from "react-native";
-import { TextInput as DefaultTextInput,  Button as DefaultButton, Appbar as DefaultAppbar } from "react-native-paper";
+import { TextInput as DefaultTextInput,  Button as DefaultButton, Appbar as DefaultAppbar, Searchbar as DefaultSearchbar } from "react-native-paper";
 import { TextInputProps as DefaultTextInputProps } from "react-native-paper/lib/typescript/components/TextInput/TextInput";
+import  DropDownPicker, { DropDownPickerProps as DefaultDropDownPickerProps} from "react-native-dropdown-picker";
 
 import Colors, { orangeColor } from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
@@ -30,6 +31,8 @@ export type ViewProps = ThemeProps & DefaultView["props"];
 export type TextInputProps = ThemeProps & DefaultTextInputProps
 export type ButtonProps = ThemeProps & DefaultButton["props"];
 export type AppbarProps = ThemeProps & DefaultAppbar["props"];
+export type SearchbarProps = ThemeProps & DefaultSearchbar["props"];
+export type DropDownPickerProps = ThemeProps & DefaultDropDownPickerProps;
 
 export function Text(props: TextProps): JSX.Element {
     const { style, lightColor, darkColor, ...otherProps } = props;
@@ -59,6 +62,20 @@ export const TextInput = (props: TextInputProps): JSX.Element => {
     );
 };
 
+export const Searchbar = (props: SearchbarProps): JSX.Element => {
+    const { style, lightColor, darkColor, ...otherProps } = props;
+    const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, "background");
+    const themeColor = useThemeColor({ light: lightColor, dark: darkColor }, "primary");
+
+    return (
+        <DefaultSearchbar
+            style={[{ backgroundColor }, style]}
+            theme={{ colors: { primary: themeColor  } }}
+            {...otherProps} />
+    );
+};
+
+
 export const Button = (props: ButtonProps): JSX.Element => {
     const { style, lightColor, darkColor, ...otherProps } = props;
     const themeColor = useThemeColor({ light: lightColor, dark: darkColor }, "primary");
@@ -82,6 +99,23 @@ export const AppbarHeader = (props: AppbarProps): JSX.Element => {
             style={[{ backgroundColor }, style]}
             {...otherProps}
             theme={{ colors: { primary: themeColor, backgroundColor: themeColor,   } }}
+        />
+    );
+};
+
+export const DropDownMenu = (props: DropDownPickerProps): JSX.Element => {
+    const { style, dropDownStyle, labelStyle, arrowColor, lightColor, darkColor, ...otherProps } = props;
+    const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, "background");
+    const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+
+    return (
+        <DropDownPicker
+            style ={[{ backgroundColor: backgroundColor }, style]}
+            dropDownStyle ={[{ backgroundColor }, dropDownStyle]}
+            labelStyle ={[{ color }, labelStyle]}
+            arrowColor  = {color}
+            {...otherProps}
+            // theme={{ colors: { primary: themeColor, backgroundColor: themeColor,   } }}
         />
     );
 };

@@ -1,26 +1,27 @@
 /* eslint-disable max-len */
 import React, { useEffect, useState } from "react";
 import { ImageBackground, StyleSheet, TouchableOpacity } from "react-native";
-import { TakePictureResponse } from "react-native-camera";
 import { useCanvas } from "../../hooks/userCanvas";
 import { View } from "../Themed";
-import { Hold } from "./WallComponents";
+import { Hold, HoldType, WallPicture } from "./WallComponents";
 import Canvas from "react-native-canvas";
 
 
 type CameraPreviewProps = {
-    photo: TakePictureResponse;
+    photo: WallPicture;
     holds: Hold[];
+    isCreatingRoute? : boolean
 }
 
 const WallView = (props: CameraPreviewProps): JSX.Element => {
     const [imgElementWidth, SetImgElementWidth] = useState<number>(0);
     const [imgElementHeight, SetImgElementHeight] = useState<number>(0);
     const [windowWidth, SetWindowWidth] = useState<number>(0);
-    const [ SetImageDim, setCanvasWidth, setCanvasHolds, canvasRef ] = useCanvas();
+    const [ SetImageDim, setCanvasWidth, setCanvasHolds, updateHoldStroke, canvasRef ] = useCanvas();
 
     const holdsButton = props.holds.map( (holdInfo: Hold) =>  {
         const buttonWith = 20;
+
         return (
             // eslint-disable-next-line react-native/no-inline-styles
             <TouchableOpacity style={{
@@ -29,10 +30,36 @@ const WallView = (props: CameraPreviewProps): JSX.Element => {
                 backgroundColor: "transparent",
                 borderRadius: 50,
                 position: "absolute",
+                zIndex: 100,
                 left: (imgElementWidth *  ( (holdInfo.box.x +   (holdInfo.box.w / 2 )) / props.photo.height )) - (buttonWith / 2),
                 top :  (imgElementHeight * ( (holdInfo.box.y +   (holdInfo.box.h / 2 )) / props.photo.width )) - (buttonWith / 2),
 
-            }} />
+            }}
+            onPress={ () => {
+                if (!props.isCreatingRoute) return;
+                switch (holdInfo.type) {
+                case HoldType.top:
+                    holdInfo.type = HoldType.neutral;
+                    break;
+                case HoldType.foot:
+                    holdInfo.type = HoldType.start;
+                    break;
+                case HoldType.hand:
+                    holdInfo.type = HoldType.foot;
+                    break;
+                case HoldType.start:
+                    holdInfo.type = HoldType.top;
+                    break;
+                case HoldType.neutral:
+                default:
+                    holdInfo.type = HoldType.hand;
+                    break;
+                }
+
+                updateHoldStroke(holdInfo);
+
+            }}
+            />
         );});
 
     useEffect(() => {
@@ -42,7 +69,7 @@ const WallView = (props: CameraPreviewProps): JSX.Element => {
     }, [imgElementWidth]);
 
     return (
-        <View  style={styles.photoContainer}onLayout={(event) => {
+        <View  style={styles.photoContainer} onLayout={(event) => {
             SetWindowWidth(event.nativeEvent.layout.width);
         }}>
             <ImageBackground style={ {width: windowWidth, height: windowWidth * (4/3)  }}
@@ -50,12 +77,13 @@ const WallView = (props: CameraPreviewProps): JSX.Element => {
                     SetImgElementWidth(event.nativeEvent.layout.width);
                     SetImgElementHeight(event.nativeEvent.layout.height);
                 }}>
-                {holdsButton}
             </ImageBackground>
             <Canvas
                 style={styles.canvas}
                 ref={canvasRef}
             />
+            {holdsButton}
+
         </View>
     );
 };

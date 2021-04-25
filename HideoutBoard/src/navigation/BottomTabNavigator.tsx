@@ -8,7 +8,7 @@ import { StyleSheet } from "react-native";
 import Colors from "../constants/Colors";
 import useColorScheme from "../hooks/useColorScheme";
 import TabOneScreen from "../screens/TabOneScreen";
-import { ScanWallParamList, BottomTabParamList, TabOneParamList, MyWallsParamList, } from "./types";
+import { ScanWallParamList, BottomTabParamList, TabOneParamList, MyWallsParamList as MyBoardsParamList, } from "./types";
 import ScanWallScreen from "../screens/ScanWallScreen";
 import MyWallsScreen from "../screens/MyWallsScreen";
 import ClimbingIcon from "../../assets/svg/climbingIcon";
@@ -30,7 +30,7 @@ export default function BottomTabNavigator(): JSX.Element {
                 }}
             /> */}
             <BottomTab.Screen
-                name="MyWalls"
+                name="MyBoards"
                 component={MyWallsNavigator}
                 options={{
                     tabBarIcon: ({ color }) => <ClimbingIcon color={color}  size={30} />,
@@ -83,17 +83,17 @@ function ScanWallNavigator() {
     );
 }
 
-const MyWallsStack = createStackNavigator<MyWallsParamList>();
+const MyBoardsStack = createStackNavigator<MyBoardsParamList>();
 
 function MyWallsNavigator() {
     return (
-        <MyWallsStack.Navigator>
-            <MyWallsStack.Screen
-                name="MyWallsScreen"
+        <MyBoardsStack.Navigator>
+            <MyBoardsStack.Screen
+                name="MyBoardsScreen"
                 component={MyWallsScreen}
-                options={{ headerTitle: "Walls" }}
+                options={{ headerTitle: "Hideout Boards" }}
             />
-        </MyWallsStack.Navigator>
+        </MyBoardsStack.Navigator>
     );
 }
 

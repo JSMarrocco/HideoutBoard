@@ -21,6 +21,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         paddingLeft: "5%",
+        paddingRight: "5%",
         paddingVertical:"2%",
         backgroundColor: "#252525",
         // marginVertical: "2%",

@@ -5,11 +5,11 @@ import {StyleSheet, View } from "react-native";
 import { TakePictureResponse } from "react-native-camera";
 import { Appbar } from "react-native-paper";
 import { AppbarHeader } from "../Themed";
-import { Hold } from "../walls/WallComponents";
+import { Hold, WallPicture } from "../walls/WallComponents";
 import WallView from "../walls/WallView";
 
 type CameraPreviewProps = {
-    photo: TakePictureResponse;
+    photo: WallPicture;
     holds: Hold[];
     retakePictureAction: () => void;
     confirmPictureAction: () => void;
@@ -20,8 +20,8 @@ const CameraPreview = (props: CameraPreviewProps): JSX.Element => {
         <View style={styles.previewContainer}>
             <AppbarHeader>
                 <Appbar.Action icon="close" onPress={props.retakePictureAction} />
-                <Appbar.Content />
-                <Appbar.Action icon={"arrow-right"} onPress={props.confirmPictureAction} />
+                <Appbar.Content title={"Successfully digitized wall"}/>
+                <Appbar.Action icon={"content-save"} onPress={props.confirmPictureAction} />
             </AppbarHeader>
             <WallView photo={props.photo} holds={props.holds}/>
         </View>);
