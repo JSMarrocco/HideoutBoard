@@ -5,13 +5,14 @@ import { Text, View } from "../components/Themed";
 import { RNCamera as Camera, TakePictureResponse } from "react-native-camera";
 import { Hold, HoldType, Wall } from "../components/walls/WallComponents";
 import OpenCV from "../NativeModules/OpenCV";
-import { deleteFile, readFile, writeFile } from "../helpers/FileManaging";
+import { deleteFile, moveFile, readFile, writeFile } from "../helpers/FileManaging";
 import { Guid } from "guid-typescript";
 import { WALLS_DATA_FILE_NAME } from "../constants/Constants";
 import CameraPreview from "../components/scanWall/CameraPreview";
 import WallRegister from "../components/scanWall/wallRegister";
 import { orangeColor } from "../constants/Colors";
 import { WallsContext } from "../provider/WallsProvider";
+import * as RNFS from "react-native-fs";
 
 enum BoxState {
     camera,
@@ -98,28 +99,32 @@ const ScanWallScreen = (): JSX.Element => {
 
         if(!capturedHolds || !capturedImage) return;
 
-        const newWall: Wall = {
-            id: Guid.create().toString(),
-            name: name,
-            description: description,
-            holds: capturedHolds,
-            routes: [],
-            picture: {
-                width: capturedImage.width,
-                height: capturedImage.height,
-                uri: capturedImage.uri
-            }
-        };
+        const  imgPath = `file://${RNFS.DocumentDirectoryPath}/${capturedImage.uri.split("Camera/")[1]}`;
+        moveFile(capturedImage.uri, imgPath ).then( () => {
+            const newWall: Wall = {
+                id: Guid.create().toString(),
+                name: name,
+                description: description,
+                holds: capturedHolds,
+                routes: [],
+                picture: {
+                    width: capturedImage.width,
+                    height: capturedImage.height,
+                    uri: imgPath
+                }
+            };
 
-        setWalls(walls.concat(newWall));
+            setWalls(walls.concat(newWall));
 
-        writeFile(WALLS_DATA_FILE_NAME, JSON.stringify(walls))
-            .then( res =>  console.log("New Wall Added"))
-            .catch( (err) => console.error(err));
+            writeFile(WALLS_DATA_FILE_NAME, JSON.stringify(walls))
+                .then( () =>  console.log("New Wall Added"))
+                .catch( (err) => console.error(err));
 
-        setCapturedImage(null);
-        setCapturedHolds(null);
-        setBoxState(BoxState.camera);
+            setCapturedImage(null);
+            setCapturedHolds(null);
+            setBoxState(BoxState.camera);
+        });
+
 
     };
 

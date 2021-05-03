@@ -23,8 +23,8 @@ const AddRouteComponent = (props: AddRouteComponentProps): JSX.Element => {
         <View style={styles.container}>
             <AppbarHeader>
                 <Appbar.Action icon="close" onPress={() => {props.cancelAction();}} />
-                <Appbar.Content title={"Route creation"}  />
-                <Appbar.Action icon="arrow-right" onPress={() => {
+                <Appbar.Content title={"Route setting"}  />
+                <Appbar.Action icon={"content-save"} onPress={() => {
                     const filterCopiedHolds = copyHolds.filter(h => h.type !== HoldType.neutral).map( (fh, i) => {
                         fh.id = i;
                         return fh;

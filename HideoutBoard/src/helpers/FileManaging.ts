@@ -27,7 +27,7 @@ export function deleteFile(filepath: string): Promise<void> {
 
 export function readFile(fileName: string): Promise<undefined | string> {
 
-    const filepath = `file://${RNFS.CachesDirectoryPath}/${fileName}`;
+    const filepath = `file://${RNFS.DocumentDirectoryPath}/${fileName}`;
 
     return new Promise((resolve, reject) =>
     {
@@ -48,7 +48,7 @@ export function readFile(fileName: string): Promise<undefined | string> {
 
 export function writeFile(fileName: string, json: string): Promise<void> {
 
-    const filepath = `file://${RNFS.CachesDirectoryPath}/${fileName}`;
+    const filepath = `file://${RNFS.DocumentDirectoryPath}/${fileName}`;
 
     return new Promise((resolve, reject) =>
     {
@@ -62,6 +62,36 @@ export function writeFile(fileName: string, json: string): Promise<void> {
                 RNFS.writeFile(filepath, json, "ascii")
                     .then( (res) => resolve(res) )
                     .catch( err => {reject(err.message);} ) ;
+            })
+            .catch((err) => {
+                reject(err.message);
+            });
+    });
+}
+
+export function moveFile(pathSrc: string, pathDest: string): Promise<void> {
+
+    return new Promise((resolve, reject) =>
+    {
+
+        console.log(pathSrc);
+        console.log(pathDest);
+
+
+        RNFS.exists(pathSrc)
+            .then( async (result)  => {
+
+                // // Override file
+                // if (result) await deleteFile(pathDest);
+                console.log("Before cpoy");
+
+                RNFS.copyFile(pathSrc, pathDest)
+                    .then( async (res) => {
+                        await deleteFile(pathSrc);
+                        resolve(res);
+                    })
+                    .catch( err => {reject(err.message);} ) ;
+
             })
             .catch((err) => {
                 reject(err.message);

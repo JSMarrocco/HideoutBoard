@@ -20,7 +20,7 @@ const WallView = (props: CameraPreviewProps): JSX.Element => {
     const [ SetImageDim, setCanvasWidth, setCanvasHolds, updateHoldStroke, canvasRef ] = useCanvas();
 
     const holdsButton = props.holds.map( (holdInfo: Hold) =>  {
-        const buttonWith = 20;
+        const buttonWith = 20; //(imgElementWidth * (holdInfo.box.w)/props.photo.height) / 2;;
         const componentKey = Guid.create().toString();
 
         return (

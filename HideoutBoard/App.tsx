@@ -13,12 +13,12 @@ export default function App(): JSX.Element | null {
 
     return (
         <PaperProvider>
-            {/* <SafeAreaProvider> */}
-            <WallsProvider>
-                <Navigation colorScheme={colorScheme} />
-                <StatusBar />
-            </WallsProvider>
-            {/* </SafeAreaProvider> */}
+            <SafeAreaProvider>
+                <WallsProvider>
+                    <Navigation colorScheme={colorScheme} />
+                    <StatusBar />
+                </WallsProvider>
+            </SafeAreaProvider>
         </PaperProvider>
 
     );
