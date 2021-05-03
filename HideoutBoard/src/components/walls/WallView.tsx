@@ -5,7 +5,7 @@ import { useCanvas } from "../../hooks/userCanvas";
 import { View } from "../Themed";
 import { Hold, HoldType, WallPicture } from "./WallComponents";
 import Canvas from "react-native-canvas";
-
+import { Guid } from "guid-typescript";
 
 type CameraPreviewProps = {
     photo: WallPicture;
@@ -21,10 +21,11 @@ const WallView = (props: CameraPreviewProps): JSX.Element => {
 
     const holdsButton = props.holds.map( (holdInfo: Hold) =>  {
         const buttonWith = 20;
+        const componentKey = Guid.create().toString();
 
         return (
             // eslint-disable-next-line react-native/no-inline-styles
-            <TouchableOpacity style={{
+            <TouchableOpacity key={componentKey} style={{
                 width: buttonWith, // (imgElementWidth * (holdInfo.box.w)/props.photo.height),
                 height: buttonWith, //  (imgElementHeight * (holdInfo.box.h)/props.photo.width),
                 backgroundColor: "transparent",

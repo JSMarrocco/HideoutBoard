@@ -17,14 +17,14 @@ export class Hold {
 export type routeDifficulty = "V0" | "V1" | "V2" | "V3" | "V4" | "V5" | "V6" | "V7" | "V8" | "V9" | "V10" | "V11" | "V12";
 
 export class Route {
-    key = "";
+    id = "";
     name = "";
     difficulty: routeDifficulty = "V0";
     holds: Hold[] = [];
 }
 
 export class Wall {
-    key = "";
+    id = "";
     name = "";
     description = "";
     holds: Hold[] = [];

@@ -1,3 +1,4 @@
+import { Guid } from "guid-typescript";
 import React from "react";
 import { ScrollView, StyleSheet, Text, View, } from "react-native";
 import ListTile from "./ListTile";
@@ -5,8 +6,9 @@ import ListTile from "./ListTile";
 const ScrollableList = (props: Readonly<{children?: React.ReactNode;}>): JSX.Element => {
 
     const items = props.children.map( c => {
+        const componentKey = Guid.create().toString();
         return(
-            <View>
+            <View key={componentKey}>
                 {c}
                 {/* <View style={styles.separator}/> */}
             </View>

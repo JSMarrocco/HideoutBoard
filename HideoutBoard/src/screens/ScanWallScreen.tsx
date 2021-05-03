@@ -99,7 +99,7 @@ const ScanWallScreen = (): JSX.Element => {
         if(!capturedHolds || !capturedImage) return;
 
         const newWall: Wall = {
-            key: Guid.create().toString(),
+            id: Guid.create().toString(),
             name: name,
             description: description,
             holds: capturedHolds,

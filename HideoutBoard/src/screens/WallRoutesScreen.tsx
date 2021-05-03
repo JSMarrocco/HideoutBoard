@@ -27,7 +27,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
 
     const saveRoute = (routeName: string, difficulty: routeDifficulty) => {
         const newRoute: Route = {
-            key: Guid.create().toString(),
+            id: Guid.create().toString(),
             name: routeName,
             difficulty: difficulty,
             holds: newRouteHold
@@ -81,7 +81,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
 
     const routes = (props.wall.routes.length > 0) ? props.wall.routes.map( (r:Route) => {
         return (
-            <View>
+            <View  key={r.id}>
                 <Card
                     onPress={ () =>  { setSelectedRoute(r);}}
                 >
@@ -103,7 +103,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
         );
     }) :  (
         <View style={styles.emptyContainer} >
-            <Text style={styles.emptyText}>You haven't created any routes yet!</Text>
+            <Text style={styles.emptyText}>You haven't created any route yet!</Text>
         </View> );
 
     return (

@@ -24,7 +24,7 @@ const MyWallsScreen = (): JSX.Element => {
     const deleteWall = (wall: Wall, setWalls: React.Dispatch<React.SetStateAction<Wall[]>>) => {
         deleteFile(`file://${RNFS.DocumentDirectoryPath}/${WALLS_DATA_FILE_NAME}`);
         deleteFile(wall.picture.uri);
-        setWalls(walls.filter(w => w.key != wall.key));
+        setWalls(walls.filter(w => w.id != wall.id));
     };
 
     const wallTiles = walls.filter( (wall: Wall) => wall.name.toLowerCase().includes(searchQuery.toLocaleLowerCase()))
@@ -32,7 +32,7 @@ const MyWallsScreen = (): JSX.Element => {
             const descriptionString = (!wall.description || wall.description === "") ? "No description":  wall.description;
 
             return (
-                <View>
+                <View key={wall.id}>
                     <Card
                         onPress={ () =>  { setSelectedWall(wall); }}
                     >
@@ -52,7 +52,7 @@ const MyWallsScreen = (): JSX.Element => {
         return (
             <View style={styles.emptyContainer}>
                 <ClimbingIcon color={"#FFF"}  size={"30%"} />
-                <Text style={styles.emptyText}>You haven't created any Hideout Boards yet!</Text>
+                <Text style={styles.emptyText}>You haven't created any Hideout Board yet!</Text>
             </View>
         );
     }
