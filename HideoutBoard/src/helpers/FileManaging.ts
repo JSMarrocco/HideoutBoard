@@ -33,6 +33,7 @@ export function readFile(fileName: string): Promise<undefined | string> {
     {
         RNFS.exists(filepath)
             .then( (result): void  => {
+
                 if (!result) resolve(undefined);
 
                 RNFS.readFile(filepath, "ascii")
@@ -52,12 +53,8 @@ export function writeFile(fileName: string, json: string): Promise<void> {
 
     return new Promise((resolve, reject) =>
     {
-
         RNFS.exists(filepath)
             .then( async (result)  => {
-
-                // Override file
-                if (result) await deleteFile(filepath);
 
                 RNFS.writeFile(filepath, json, "ascii")
                     .then( (res) => resolve(res) )
@@ -74,20 +71,11 @@ export function moveFile(pathSrc: string, pathDest: string): Promise<void> {
     return new Promise((resolve, reject) =>
     {
 
-        console.log(pathSrc);
-        console.log(pathDest);
-
-
         RNFS.exists(pathSrc)
-            .then( async (result)  => {
+            .then( async ()  => {
 
-                // // Override file
-                // if (result) await deleteFile(pathDest);
-                console.log("Before cpoy");
-
-                RNFS.copyFile(pathSrc, pathDest)
+                RNFS.moveFile(pathSrc, pathDest)
                     .then( async (res) => {
-                        await deleteFile(pathSrc);
                         resolve(res);
                     })
                     .catch( err => {reject(err.message);} ) ;

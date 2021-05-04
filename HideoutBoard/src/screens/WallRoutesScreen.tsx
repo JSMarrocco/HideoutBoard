@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { Guid } from "guid-typescript";
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { ImageBackground, ScrollView, StyleSheet } from "react-native";
 import { Appbar, Card, Divider, IconButton } from "react-native-paper";
 import ScrollableList from "../components/list/ScrollableList";
@@ -10,20 +10,27 @@ import RouteViewComponent from "../components/routes/RouteViewComponent";
 import { AppbarHeader, View, Text } from "../components/Themed";
 import { Hold, Route, routeDifficulty, Wall } from "../components/walls/WallComponents";
 import WallView from "../components/walls/WallView";
+import { WallsContext } from "../provider/WallsProvider";
 
 type WallRoutesScreenProps = {
-    wall: Wall
+    wallId: string
     cancelAction: () => void;
 }
 
 const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
 
+    const  {walls, setWalls} = useContext(WallsContext);
     const [windowWidth, SetWindowWidth] = useState<number>(0);
     const [isAddingRoute, SetIsAddingRoute] = useState<boolean>(false);
     const [isRegisteringRoute, setIsRegisteringRoute] = useState<boolean>(false);
     const [selectedRoute, setSelectedRoute] = useState<Route | undefined>(undefined);
     const [refreshing, setRefreshing] = React.useState(false);
     const [newRouteHold, setNewRouteHold] = useState<Hold[]>([]);
+    const [currentWall, setCurrentWall] = useState<Wall>(new Wall());
+
+    useEffect(() => {
+        setCurrentWall(walls.find(w => w.id === props.wallId) || new Wall());
+    }, []);
 
     const saveRoute = (routeName: string, difficulty: routeDifficulty) => {
         const newRoute: Route = {
@@ -33,7 +40,9 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
             holds: newRouteHold
         };
 
-        props.wall.routes.push(newRoute);
+        currentWall.routes.push(newRoute);
+        setWalls(walls.filter(w => w.id !== props.wallId).concat(currentWall));
+
         setNewRouteHold([]);
         setIsRegisteringRoute(false);
         SetIsAddingRoute(false);
@@ -43,7 +52,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
         return (
             <RouteViewComponent
                 route={selectedRoute}
-                picture={props.wall.picture}
+                picture={currentWall.picture}
                 cancelAction={() => {
                     setSelectedRoute(undefined);
                 } }
@@ -66,7 +75,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
 
         return (
             <AddRouteComponent
-                wall={props.wall}
+                wall={currentWall}
                 cancelAction={() => {
                     setNewRouteHold([]);
                     SetIsAddingRoute(false);
@@ -79,7 +88,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
     }
 
 
-    const routes = (props.wall.routes.length > 0) ? props.wall.routes.map( (r:Route) => {
+    const routes = (currentWall.routes.length > 0) ? currentWall.routes.map( (r:Route) => {
         return (
             <View  key={r.id}>
                 <Card
@@ -89,10 +98,11 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
                         title={r.name}
                         subtitle={r.difficulty}
                         right={(propss) => <IconButton {...propss} icon="trash-can-outline" onPress={ () => {
-                            const index = props.wall.routes.indexOf(r, 0);
+                            const index = currentWall.routes.indexOf(r, 0);
                             if (index > -1) {
-                                props.wall.routes.splice(index, 1);
+                                currentWall.routes.splice(index, 1);
                             }
+                            setWalls(walls.filter(w => w.id !== props.wallId).concat(currentWall));
                             setRefreshing(!refreshing);
 
                         }} />}
@@ -110,7 +120,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
         <View>
             <AppbarHeader>
                 <Appbar.Action icon="arrow-left" onPress={() => {props.cancelAction();}} />
-                <Appbar.Content title={`Routes for ${props.wall.name}`}  />
+                <Appbar.Content title={`Routes for ${currentWall.name}`}  />
                 <Appbar.Action icon="plus" onPress={() => SetIsAddingRoute(true)} />
             </AppbarHeader>
             <ScrollView style={styles.routeList}>
@@ -121,7 +131,7 @@ const WallRoutesScreen = (props: WallRoutesScreenProps): JSX.Element => {
                         {/* <WallView photo={props.wall.picture} holds={props.wall.holds} /> */}
                         <ImageBackground
                             style={ {width: windowWidth, height:  windowWidth * (4/3)  }}
-                            source={{uri: props.wall.picture.uri}}>
+                            source={{uri: walls.find(w => w.id === props.wallId)?.picture.uri}}>
                         </ImageBackground>
                     </View>
                 </View>

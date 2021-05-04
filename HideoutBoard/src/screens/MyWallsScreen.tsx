@@ -17,7 +17,7 @@ const MyWallsScreen = (): JSX.Element => {
 
     const  {walls, setWalls} = useContext(WallsContext);
     const [searchQuery, setSearchQuery] = useState("");
-    const [selectedWall, setSelectedWall] = useState<Wall | undefined>(undefined);
+    const [selectedWallId, setSelectedWallId] = useState<string>("");
 
     const onChangeSearch = (query: string) => setSearchQuery(query);
 
@@ -34,7 +34,7 @@ const MyWallsScreen = (): JSX.Element => {
             return (
                 <View key={wall.id}>
                     <Card
-                        onPress={ () =>  { setSelectedWall(wall); }}
+                        onPress={ () =>  { setSelectedWallId(wall.id); }}
                     >
                         <Card.Cover source={{ uri: wall.picture.uri }} />
                         <Card.Title
@@ -58,8 +58,8 @@ const MyWallsScreen = (): JSX.Element => {
     }
 
 
-    if (selectedWall) {
-        return (<WallRoutesScreen wall={selectedWall} cancelAction={() => {setSelectedWall(undefined);}}/>);
+    if (selectedWallId !== "") {
+        return (<WallRoutesScreen wallId={selectedWallId} cancelAction={() => {setSelectedWallId("");}}/>);
     }
 
     return (

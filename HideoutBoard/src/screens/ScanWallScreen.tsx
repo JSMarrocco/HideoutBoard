@@ -116,7 +116,9 @@ const ScanWallScreen = (): JSX.Element => {
 
             setWalls(walls.concat(newWall));
 
-            writeFile(WALLS_DATA_FILE_NAME, JSON.stringify(walls))
+            const stringifyWallsFile = JSON.stringify(walls);
+
+            writeFile(WALLS_DATA_FILE_NAME, stringifyWallsFile)
                 .then( () =>  console.log("New Wall Added"))
                 .catch( (err) => console.error(err));
 

@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from "react";
 import { Wall } from "../components/walls/WallComponents";
 import { WALLS_DATA_FILE_NAME } from "../constants/Constants";
-import { readFile } from "../helpers/FileManaging";
+import { readFile, writeFile } from "../helpers/FileManaging";
 
 export const WallsContext = createContext<{walls: Wall[], setWalls: React.Dispatch<React.SetStateAction<Wall[]>>}>({
     walls: [],
@@ -20,6 +20,16 @@ export const  WallsProvider= (props: Readonly<{children?: React.ReactNode;}>): J
             })
             .catch( (err) => console.error(err));
     }, [] );
+
+    useEffect(() => {
+
+        const stringifyWallsFile = JSON.stringify(walls);
+
+        writeFile(WALLS_DATA_FILE_NAME, stringifyWallsFile)
+            .then( () =>  console.log("Wall Updated"))
+            .catch( (err) => console.error(err));
+
+    }, [walls] );
 
     const value = {walls, setWalls};
 
